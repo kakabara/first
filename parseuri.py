@@ -7,6 +7,18 @@ URL_PREFICS2=r'https://'
 URL_WWW='www.'
 MASK_HREF=re.compile('<a.*?href=(".*?").*?>')
 G_URL=''
+visited_link=[]
+
+def print_result():
+	f=open('uri.txt','r')
+	i=1
+	line_uri=f.readline()
+	print(line_uri)
+	while (line_uri):
+		line_uri=f.readline()
+		print(line_uri)
+		i+=1
+	print('Count link:',i)
 
 def get_page(url):
 	res = 'error'
@@ -41,8 +53,6 @@ def correct_URI(uri):
 			return True
 		return False
 	
-
-
 def get_clear_URL(URL):
 #Очищаем урл от всех левых знаков в начале
 	URL=URL.replace(' ','')
@@ -88,6 +98,7 @@ def get_URI_frm_Page(URI):
 	ar_href=get_URI(URI)
 	if(ar_href=='0'):
 		return
+	links=[]
 	for href in ar_href:	
 		uri=get_clear_URL(str(href).replace('"',''))
 		uri=without_anchor(uri)
@@ -97,17 +108,26 @@ def get_URI_frm_Page(URI):
 					f=open('uri.txt','a')
 					f.write(uri+'\n')
 					f.close()
+					links.append(uri)
 					#print(uri)
-					get_URI_frm_Page(change_uri(uri))
+
+	for link in links:
+		print(link in visited_link)
+		if (link in visited_link):
+			visited_link.append(link)
+			get_URI_frm_Page(change_uri(link))
 
 
 Input_URL=input('Сылка должна начинаться с "http://": ')
 G_URL=get_clear_URL(Input_URL)
-if (len(Input_URL)!=0):
+if (len(Input_URL)!=0 and (Input_URL.find('http://')>-1 or Input_URL.find('https://')>-1)):
 	f=open('uri.txt','w')
 	f.write(G_URL+'\n')
 	f.close()
+	visited_link.append(G_URL)
 	get_URI_frm_Page(Input_URL)
 else:
 	print("Некорректный URL")
+
+print_result()
 
